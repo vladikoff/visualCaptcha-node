@@ -20,7 +20,8 @@ app.use( sessions({
 
 // Enable CORS
 app.use( function( req, res, next ) {
-    res.header( 'Access-Control-Allow-Origin', '*' );
+    res.header( 'Access-Control-Allow-Origin', 'http://127.0.0.1:3030' );
+    res.header('Access-Control-Allow-Credentials', 'true');
     next();
 } );
 
@@ -93,6 +94,7 @@ _trySubmission = function( req, res, next ) {
     visualCaptcha = require( 'visualcaptcha' )( req.session, req.query.namespace );
 
     frontendData = visualCaptcha.getFrontendData();
+    console.log(frontendData);
 
     // Add namespace to query params, if present
     if ( namespace && namespace.length !== 0 ) {
@@ -135,11 +137,9 @@ _trySubmission = function( req, res, next ) {
         }
     }
 
-    if ( req.accepts( 'html' ) !== undefined ) {
-        res.redirect( '/?' + queryParams.join( '&' ) );
-    } else {
-        res.status( responseStatus );
-    }
+
+    console.log(responseStatus)
+    return  res.status( responseStatus ).send('ok');
 };
 
 // Routes definition
@@ -156,6 +156,11 @@ app.get( '/image/:index', _getImage );
 
 // @param howmany is required, the number of images to generate
 app.get( '/start/:howmany', _startRoute );
+
+app.use(function(err, req, res, next) {
+    console.error(err.stack);
+    res.status(500).send(err);
+});
 
 module.exports = app;
 
